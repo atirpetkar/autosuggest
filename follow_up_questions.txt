@@ -1,0 +1,34 @@
+1. How would you evaluate your autosuggest server? If you made another version, how would you compare the two to decide which is better?
+
+To compare between 2 models A and other version B, it makes sense to do an A/B test where there are 2 groups,
+one of which will be a control group users of a model A and the other will be test group users of model B.
+The metric to decide which model works better, can be decided by how many characters in average did a person have to type until a sentence was selected,
+may be a good way to evaluate this.
+
+
+
+2. One way to improve the autosuggest server is to give topic-specific suggestions. How would you design an auto-categorization server? It should take a list of messages and return a TopicId. (Assume that every conversation in the training set has a TopicId).
+
+As for my initial pass, I would try to make a bag of words model, which is basically each conversation will have columns of the whole vocabulary in the training
+ (i.e. all the unique words in the training dataset) and each term in it with value 1 (or count if a term comes more than once), target variable being the topicId. With this structure, we can run a ML model and look at its performance / probability of how much it thinks it belongs to a particular topic. Instead of count, I would also like to put features as tf-idf score and look at its performance as well. Another thing i might add in the above bag of words model is n-grams, which might help increase accuracy but slow down the process, as the vocabulary size increases even more now.
+
+As bag of word model has a sparse row for each conversation (since each conversation will have only few words from training vocabulary), i
+t will be even better from efficiency point of view, if we make use of word embeddings which is a dense representation of the word
+and can be used with a deep neural network such as Recurrent Neural Network, such as LSTM to classify its topic.
+
+
+
+3. How would you evaluate if your auto-categorization server is good?
+
+Basically using various ML methods to make sure that our selected model is good enough, we can make use of K-fold cross validation,
+splitting up the data in different sets such as training/validation/test split. To evaluate the performance of our model,
+the simplest would be to figure out a mean-squared error measure for the characterization of topics.
+In theory, if you correctly predict the topic, you should be able to have better recommendations.
+
+
+
+4. Processing hundreds of millions of conversations for your autosuggest and auto-categorize models could take a very long time. How could you distribute the processing across multiple machines?
+
+Most preprocessing could be done using MapReduce. As for modeling algorithms, MLlib can be used. Ensemble algorithms such as random forest etc,
+which consists of multiple learners for the classification can really make use of distributed processing.
+
